@@ -1,0 +1,519 @@
+                Session-21 Class
+            -----------------------
+
+                        MongoDB
+                    ===============
+-It is open source and cross platform NON-SQL database.
+-It is document oriented and semi-structure database
+-Document oriented allows to handle schema less content
+-ORM introduced features like lazy loading, change tracking, identity resolution etc..
+-It supports AD-HOC querying.[Dynamic Queries]
+-It supports indexing[it doesn't require primary key field]
+-it supports data replications, which enables to handle load
+
+
+Issues with MongoDB:
+--------------------
+-it is structured less.
+-it is non-relational
+-it is not great for data predictions and analytics
+
+
+Setup MongoDB in your PC
+1.Download and MongoDB Community Server
+  URL: https://www.mongodb.com/try/download/community
+
+2.RUn the installer on your PC and select "MongoDB Compass"
+  while installing.
+
+3.Start MongoDB server from "Services.msc"
+
+4.MongoDB server runs on following IP location
+	mongodb://127.0.0.1:27017
+		  (or)
+	mongodb://localhsot:27017
+
+5.Open MongoDB Compass on your PC
+  [it is a GUI tool for managing MongoDB]
+
+6.Add new connection with following address
+
+	mongodb://127.0.0.1:27017
+
+7.Connect & Save
+
+		     MongoDB Terminology
+                  -------------------------
+
+MySQL					MongoDB
+--------------------------------------------------------
+Database(Schema)	    Database
+Tables					Collections
+Record/Row				Document
+Field					Field [Key]
+Joins					Embedded Documents
+
+Note: MongoDB Compass provides
+	a)GUI		:For handling database and its objects graphically
+	b)Mongosh	:Mongo Shell, which is a CLI [Command Line Tool]
+	
+
+			Mongo Shell Commands
+		-----------------------------------
+1.To view existing databases
+	>show dbs
+ -The default databases on MongoDb server
+	a)admin
+	b)config
+	c)local
+
+2.To clear screen
+	>cls
+
+3.To recall the recently uses commands use up & down arrows
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      			Session-22 Class
+            -----------------------
+MongoDB Shell
+>show dbs
+>cls
+
+4.To use existing database or to create  a new database Mongo Shell uses
+  "use" command
+
+	>use databaseName
+
+	-If it database exists it starts using it, else it can a new database.
+	-MongoDB creates a temporary databases by specified name.
+	-You can't view the new database in the list of databases, unitil
+	 you store some data into database
+
+	
+	>db
+
+	-"db" command refers to current active database
+		>use sampledb 			=> new database name
+		>db						=> shows active database
+	
+
+
+5.Creating a new collection
+	-MongoDB database stores data in collections.
+	-Collection represents a table of MySQL
+	-You can create a new collection by uisng the method
+		"createCollection()"
+
+	Syntax:
+		>db.createCollection("name",{options})
+		>db.createCollection("name")
+
+	-Table options is a key & value collection.
+		{Key:Value}
+	-MongoDB collection options are 
+	
+	    Options							       Description
+---------------------------------------------------------------------------------
+autoIndexId						   It is a Boolen options takes "true/false"
+								   *it generates an auto generated id for every
+								    document in collection
+								   *it is unique document ID for every reacord.
+								   *it is defalut set to "true".
+
+
+size							   It refers to the memory allocated for collection
+								   *it uses "bytes" as a value
+								   *it is interger type
+										8 bits		= 1 byte
+										1024 bits   = 1 kb
+										1024 kb		= 1 mb
+										1024 mb		= 1 gb
+										1024 gb		= 1 tb
+
+									1024 x 1024	=> 1048576 [1md]
+									1048576 * 2 => 2097152 [2mb]
+
+
+max								   It defines the maximum number of documents
+								   allowed
+								   *It is a number
+
+capped							   It is Boolean a option, takes "true or fase"
+								   *if capped is set to true, you can't store more then the max limit
+							       *if capped is set to false then the new docuemnts will repalce the old.
+								
+Syntax:
+-------
+>db.createCollection("name",{autoIndexId:true/false,size:0,max:0,capped:true/false})
+
+Example:
+-------
+>db.createCollection("categories",{autoIndex:true,size:2097152,max:5,capped:true})
+
+
+6. To view the list of collections in database 
+    
+	>show collections
+
+
+7.To remove any collections you can use "drop()" method.
+
+Syntax:
+	>db.collectionName.drop()
+	
+
+Example:
+-------
+follow this steps
+ >db.createCollection("Users") 
+ >show collections
+ >db.Users.drop()
+ >show collections
+
+
+
+8.To remove any databse you have switch into the databse and use
+  the command
+
+   dropDatabase()
+
+Syntax:
+	>use databaseName
+	>db.dropDatabase();
+
+only which database is select that only removed...
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+						
+
+
+
+
+
+
+
+
+
+
+				Session-23 Class
+			======================
+FAQ: Waht is Capped Collection?
+Ans: Capped Collection After Reaching The Max Weather To Allow The New Reacords 
+	 are not by uisng capped
+		capped=true/false
+
+FAQ: How to identity capped collection?
+Ans: By uisng "isCapped()". it is a Boolean method that returns true if collection is capped.
+
+	   Syntax:
+	   -------
+	   db.collectionName.isCapped();
+
+FAQ: How to change a normal collection to capped collection?
+Ans: By uisng "db.runCommand()" with "convertToCapped" attribute.
+
+	 Syntax:
+	 -------
+	 	db.runCommand({'categories',convertToCapped:true}) //this is not wokring later conpects they tell
+
+FAQ: Can we change the capped size and capped max length?
+Ans: Yes by uisng "collMod" attribute with capped size and capped length
+
+
+
+				Insert Data into Database Collection
+			===========================================
+-Mongodb latest version recommends
+	a)insetOne()
+	b)insetMany()
+-Every Document Is JSON type
+-JSON is JavaScript Object Notation.
+-The data types of fileds are reffered as "BSON" type
+ [Binary Serialization Object Notation]
+
+
+FAQ: What is Serilization and DeSerilization?
+Ans: The process of conveting object into binary in order to transprot via network
+     and store in a data source is knonw as "Serialization".
+
+	 -The process of converting an object to binary in order to read and display
+	  is known as "DeSerilization"
+	  		Writing => Serialization
+			Reading => DeSerilization
+
+-Object is a key and value collection, where key is stirng type value is can 
+ be any BSON type.
+
+		{
+			"key":value
+		}
+
+
+
+Syntax:
+------
+	db.collectionName.insertOne({key:value,key:value})
+	db.collectionName.insertMany([{key:value},{key:value}])
+
+-The value type can be one of the BSON
+-The commonly used types
+	1.Number 
+		-int, double, decimal
+			{
+				age:22,rate:4.5,review:560
+			}
+	2.String
+		-signle quote, double quote, backtick
+		-single quote is recommended
+
+		{
+			Name:'john',
+		}
+
+	3.Boolean Type
+		-It uses only "true or false" as value
+
+		{
+			Stock:true|false
+		}
+
+	4.Null & Undefined
+	   -if value is expected dynamically then set as Null
+	   -if value is not defined statically then set as undefined
+
+	   {
+		Name:null,
+		Price:undefined
+	   }
+
+    5.Symbol
+		-it is used to configure uniquee hidden filed
+		-it is hidden over iterations but accessible individually
+
+		{
+			id: Symbol()
+		}
+
+	6.Regular Expression
+		-it uses a set of meta character quantifiers enclosed in "/ /"
+		{
+			Mobile:/\+91\d{1}/
+		}
+
+	7.Arry Type
+		-It is a sequential collection of values
+		-it can have collection of various data types
+		{
+			values:[10,"A",true]
+		}
+		-It is always recommended to use only array meta character. "[]"
+
+	8.Object Type
+		-it is a key and value collection
+		-You can configure Embedded objects
+
+		{
+			rating:{rate:45,count:848}
+		}
+
+
+	9.Date & Time 
+		-BSON Date is defined by uisng "$date" operator.
+		-It uses a data & value as string.
+
+		{
+			mfd:{
+				$date:"yy-mm-dd hr:min:sec:milliSeconds"
+			}
+		}
+
+
+Example:
+--------
+Inseting Single Documents
+
+	>db.categories.insetOne({CategoryId:1,CategoryName:"Electronics"})
+
+Inseting Multiple Documents
+	>db.categories.insertMany([{CategoriesId:2,CategoryName:"Kids Fashion",},{CategoriesId:3,CategoryName:"Men's Fashion"}])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			Session-24
+	========================
+-insetOne()
+-insertMany()
+-BSON
+
+			Querying Documents From Collections
+		-------------------------------------------
+-Create a new collection by name 'products'
+-Visit the API
+	http://fakestoreapi.com/products
+-Copy data [JSON]
+-Open Notepad => Paste copied data => Save as "data.json"
+-Go to Mongodb Compass
+-Select collection 'products' from your database.
+-Import from JSON => data.json.
+	{
+		id:number,
+		title:string,
+		description:string,
+		image:string,
+		category:string,
+		price:number,
+		rating:{rate:number, count:number}
+	}
+
+
+
+-MongoDB provides "find()" method to find documents
+-It requires a query defines as object. "{key:value}"
+
+Syntax:
+		db.collectionName.find({query})
+
+Ex:
+	db.products.find({})	:it returns all documents
+
+
+> use sampledb
+> db.products.find({}) hit enter
+
+
+-To query any specfic any docuemnt(s) it requires various opertors or entities
+	$eq		:Equal
+	$ne		:Not Equal
+	$gt		:Greater Then
+	$gte	:Greater Then or Equal
+	$lt		:Less then
+	$lte	:Less then or Equal
+	$and    :logical AND
+	$or		:logical OR
+	$not	:logical NOT
+
+
+Syntax:
+	db.collection.find({filedName:value})    : it retuns exact match [1 or many]
+	db.categoryes.find({CategoryId:2})
+
+>use sampledb
+>db.products.find({id:20})
+>db.products.find({title:'WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive'})
+>db.products.find({category:'electronics'})
+
+
+-if you want to query using any expression then it is defined as object.
+-the field name uses an objects for expression
+
+Syntax:
+		db.collection.find({field:{ expression }})
+
+
+Queries:
+1.Returns all documents whose price is above 400
+	>db.products.find({price:{$gte:400}})
+
+
+2.If your query is from  an object filed then you have to configure complete hierarchy
+  in string format
+
+  Return all products whose rating is above 4.5 [rating.rate]
+
+	>db.products.find({'rating.rate':{$gte:4.5}})
+
+3.Retun the produces with rating 4.5
+
+	>db.products.find({'rating.rate':4.5})
+	>db.products.find({'rating.count':{$gte:400}})
+	>db.products.find({'rating.rate':{$eq:4.7}})	
+
+4.Retun the products that belong to electronics and price is above 400
+  -It requires logical AND with multiple expressions
+  -Logical AND is defined using "$and"
+  -Multiple Expression are defined as "[]" array 
+
+Syntax:
+	>db.products.find({$and:[{expression-1},{expected-2},...]});
+	>db.products.find({$and:[{category:'electronics'},{price:{$gt:400}}]})
+	>db.products.find({$and:[{category:'jewelery'},{price:{$gt:400}}]})
+	>db.products.find({$and:[{category:'electronics'},{price:{$gte:400}}]})
+
+	-it returns true only when all expressions evaluate to true.
+
+5.Returns all products whose rating is between 3 % 4.5
+	>db.products.find({$and:[{'rating.rate':{$gt:3}},{'rating.rate':{$lte:4.5}}]})
+	
+
+6.Return all products whose category is 'jewelery' and rating is between 3.0 & 4.6
+
+	>db.products.find({$and:[{category:'jewelery'},{'rating.rate':{$gte:3.0}},{'rating.rate':{$lte:4.6}}]})
+
+	>db.products.find({
+		$and:[
+			{category:'electronics'},
+			{'rating.rate':{$gte:3.0}},
+			{'rating.rate':{$lte:4.6}}
+		]
+	});
+
+
