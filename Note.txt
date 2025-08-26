@@ -517,3 +517,534 @@ Syntax:
 	});
 
 
+
+
+7.Return All 'jewelery' and 'electronics'
+
+	>db.products.find({$or:[{category:'electronics'},{category:'jewelery'}]})
+
+
+8.Return all jewelery and electronics products products with rating above 4.5
+	(category==jewelery || category==electronics) && (rating.rate>4.5)
+  
+	>db.products.find({$and:[{$or:[{category:'electornics'},{category:'jewelery'}]},{'rating.rate':{$gte:4.0}}]})
+
+
+
+
+
+
+
+
+
+
+					25th Class
+	======================================
+FAQ: How to find values from arry type?
+Ans: MongoDB provides "$all" operator to find values form array
+
+Syntax:
+-------
+	{
+		id:1,
+		category:'electornics',
+		title:'Tv'
+		shippdedTo:['delhi','hyd','mumbai']
+	},
+	{
+		id:1,
+		category:'electornics',
+		title:'Tv'
+		shippdedTo:['bangulore','pune']
+	}
+
+
+	*how to find which can shippedTo 'Hyderabad'
+
+	>db.products.find({$all:{shippdedTo:['hyd']}})
+
+
+
+FAQ: How to find values in using date type?
+Ans: Date type values are stored in ISO foramt
+
+>create new collections inside sampledb like 'stock'
+>show collections
+ products
+ stock
+>db.stock.insertOne({id:1,product:'tv',mfd:'2025-01-29'})
+	after change string type date type in GUI toold
+
+
+	{
+		"mfd":{
+			"$date":"2021-01-01T00:00:00.000Z"
+		}
+	}
+
+*You can search and find Date ISO Method
+
+>db.stock.find({mfd: ISODate('2021-01-01T00:00:00.000Z')});
+
+
+			Updating Documents
+		=======================
+-Mongodb Requires a find queyr to find the document and update.
+-Update can 
+	a)modifying document data
+	b)adding fields
+	c)renaming fields
+	d)removing fields etc..
+-MongodbDB update methods are 
+	a)updateOne()
+	b)updateMany()
+-Update methods require opertors
+	a)$set
+	b)$unset
+	c)$rename
+
+		$set		:it is used to change the value of any field
+		$unset		:it removes a field
+		$rename		:it allows to change the field name.
+
+Syntax:
+	>db.collection.updateOne({query})
+
+Ex: 
+	db.products.find({})		:it returns all documents
+	
+>db.products.find({category:'electornics'});
+ -see there is no stock field
+
+>db.products.updateMany({category:'electronics'},{$set:{stock:true}})
+>db.products.updateOne({id:13},{$set:{stock:false}})
+>db.products.updateOne({id:13},{$set:{stock:true}})
+>db.products.updateOne({id:13},{$set:{stock:'hello'}})
+>db.products.find({id:13});
+
+Ex: Change the price of product with id=2
+
+>db.products.updateOne({id:2},{$set:{price:98.2}});
+
+Ex: Change the rating of products with id=2
+
+>db.products.updateOne({id:2},{$set:{'rating.rate':4.8}})
+
+Ex: Add stock field for all products with electornics category.
+
+>db.products.updateMany({category:'electornics'},{$set:{stock:true}})
+
+
+Ex: Update rating to 4.5 for all electornics product price above 400
+
+>db.products.updateMany({$and:[{category:'electronics'},{price:{$gte:20}}]},{$set:{'rating.rate':4.5}})
+>db.products.find({$and:[{category:'electronics'},{price:{$gte:20}}]})
+
+>db.products.updateMany({$and:[{category:'electronics'},{price:{$gte:20}}]},{$set:{'rating.rate':4.1}})
+>db.products.find({$and:[{category:'electronics'},{price:{$gte:20}}]});
+
+
+Ex: Update electornics and jewelery products by setting stock as true
+	>db.products.updateMany({$or:[{category:'electronics'},{category:'jewelery'}]},{$set:{stock:false}})
+	>db.products.find({$or:[{category:'electronics'},{category:'jewelery'}]})
+
+	>db.products.updateMany({$or:[{category:'electronics'},{category:'jewelery'}]},{$set:{stock:true}})
+	>db.products.find({$or:[{category:'electronics'},{category:'jewelery'}]})
+
+
+
+-You can change the field name by using  '$rename'
+
+Syntax:
+	db.collection.updateMany({find_query},{$rename:{'old_name':'new_name'}})
+
+Ex: Find all electornics and change their field name "stock" to "instock"
+
+   >db.products.updateMany({category:'electronics'},{$rename:{"stock":"instock"}})
+   
+
+-You can remove any field by uisng "$unsest".
+
+Syntax:
+	db.collection.updateMany({find_query},{$unset:{'field_name':''}})
+
+   >db.products.updateMany({category:'electronics'},{$unset:{'instock':''}})
+
+
+
+
+
+
+
+
+
+
+
+
+					26th Class
+		===================================
+MongoDB Delete Query
+--------------------
+-MongoDB allows to remove documents using following methods
+	a)deleteOne()
+	b)deleteMany()
+
+Syntax:
+	>db.collection.deleteOne({find_query});
+
+Ex:
+	>db.products.deleteOne({id:2});
+	>db.products.deleteMany({'rating.rate':{$lte:3.0}})
+
+-To remove database
+	>db.dropDatabase()
+
+
+
+
+Summary: CURD
+-------------
+-find()
+-insetOne()
+-insertMany()
+-updateOne()
+-updateMany()
+-deleteOne()
+-deleteMany()
+-createCollection()
+-use
+
+
+
+				MongoDB Validation Schmea
+		=====================================
+-Validation is the process of verifying user input
+-Validation is required to ensure that cotradicotry and unauthrozied data is not stored into
+ database.
+-MongoDB provides "jsonScheam" to configure validation for collection.
+-JSON Schema uses 'bson' types that verify the data type of value that you insert.
+-it uses 'validator' object for validtion
+
+Syntax:
+	>db.createCollection("name",{
+		validator:{
+		$jsonScheam:{
+			bsonType:"object",
+			required:[key1,key2,key3,...],
+			properties:{
+				fieldname:{bsonType:"datatype",description:"",validator:""}
+			}
+		}
+		}
+	})
+
+Example:
+	db.createCollection("users",
+	{validator:{
+		$jsonSchema:{
+			bsonType:"object",
+			required:["UserName","Age"],
+			properties:{
+				UserName:{bsonType:"string", description:"User Name Must Be A String"},
+				Age:{bsonType:"int",minimum:15,maximum:30,description:"age 15 to 30 only"}
+			}
+		}
+	}})
+
+
+-Validation Schema is defined with "validator"
+	>db.collection("name",{validator:{}})
+
+-Validator uses "$jsonSchema", which is object type
+
+	>db.collection("name",{validator:{$jsonSchema:{}}})
+
+-Every schema have following keys
+	a)bsonType				:it is always object
+	b)required				:it defines the fields that are required
+	c)properties			:it is an object that configure validation for every field.
+
+	>db.collection("name",{
+		validator:{
+			$jsonScheam:{
+				bsonType:"object",
+				required:["fields"..],
+				properties:{
+
+				}
+			}
+		}
+	})
+
+-Every filed validation is defined as object with bsontype, 
+
+	properties:{
+		field:{
+			bsonType:"datatype",
+			minimum:value,
+			maximum:value,
+			description:"message"
+		},
+		field:{
+
+		}
+	}
+
+
+
+Note: You can add new field that are not defined in validator. But you can't ignore
+      the field that are defined as required fields
+
+
+FAQ: What is clustered collection in MongoDB?
+Ans: A clustered can you have multiple indexes.
+	 You can configure multiple unique key fields other that autoIndexId.
+	 it is good for manuplation 
+	 However it is slow in interaction when there are multiple unique keys in collection.
+	
+Syntax:
+	db.createCollection(
+		"collectionName",
+		{clusteredIndex:{"key":{_id:1},"unique":true, "name":"stocks clustered key"}}
+	)
+
+
+				================MongoDB Complted==================
+
+
+
+
+
+
+
+
+								27th Class
+					=================================
+								Node Js
+							---------------
+-Node Js is an open soruce and cross platform JavaScript runtime used by developers
+ to build Web Application, Servers, CLI tools and Scripts.
+
+FAQ: What is server side scripting?
+Ans: Server Side Scripting is a technique where scripts are employeed on server,
+	 in order to generate response customized for ever client request.
+
+	 There are various server side scripting technologies like
+	 	a)PHP
+		b)ASP
+		c)JSP
+		d)Node Js
+
+ -Node Js allows to write scripts on server side. so that they can configure a business logic
+  that handle communication between client and data
+
+Feature of Node Js:
+-------------------
+1. it is JavaScript based
+2. it is single threaded.
+	-it uses a single ton pettern
+	-Objct is creted for first request and same is used acrss request
+	-it manages memory by reducing overload
+	-it improves performances of application.
+3. it is modular.
+	-Modular refers to "Part-By-Part"
+	-It configures application specific frames.
+	-It loads only what is required for the situatuion
+	-It makes application light weight and faster
+4. it is asynchronous.
+	-It uses unblocking	technique
+	-It can perform any task in background witout blocking other tasks in memory
+	-It impovess performances of application
+
+5. it will not use buffering
+	-Data is receving in the form of memory packets.
+	-So it is continues witout break.
+	
+Issues
+------
+-it is not good for multi threading interatction that are requied for application
+-it is not good for application that required lot of caching
+
+Note: Server Side Scripting technologies provides a set of server side objects
+      and techniques that are used to handel communication with client and data server.
+
+	  Objects:
+	  	-Request
+		-Response
+		-Session
+		-Application
+		-Server
+		-File Stream etc..
+	
+	  Techniques:
+	  	-Caching
+		-Routing
+		-Model Binding
+		-Event Binding etc..
+
+
+
+
+
+
+
+
+
+
+
+
+
+					28th Class[Doubt Session]
+				=================================
+
+	
+						   29 Class
+				==============================
+-What is Server Side Scripting
+-What is Node Js 
+-Features of Node Js
+
+
+			Server Side Node Application
+		=================================
+1.install node on your pc
+2.install vs code editor
+3.Add a new folder for server side application
+	D:\server-app
+4.Now open folder in vs code
+5.Open terminal run following commands
+	>npm init -y
+
+	*it generates package.json
+	 
+6.Setup language analysis tool 'esLint' for JavaScript projects
+   >npm init @eslint/config@latest
+
+   FAQ: What do you want to lint?
+   Ans: JavaScript
+
+   FAQ:  How would you like to use ESLint?
+   Ans:  To check syntax and find problems
+	
+   FAQ: What type of modules does your project use? ... 
+   Ans: CommonJS (require/exports)
+
+   FAQ: Which framework does your project use? ... 
+   Ans: None of these
+
+   FAQ: Does your project use TypeScript?
+   Ans: No
+
+   FAQ: Where does your code run?
+   Ans: Select Browser And Node [in keyboard click a both will select]
+  
+   FAQ: Would you like to install them now? » No / Yes  
+   And: Yes
+
+   FAQ: Which package manager do you want to use? · 
+   Ans: npm
+
+
+7. It will install all supported libraries and generates configuration file
+		"eslint.config.mjs"
+	
+Note: All supported libraries files are copied into "node_modules" folder
+
+
+
+
+Module Systems:
+===============
+-Application Development Requires
+	a)Language
+	b)Library
+	c)Framework
+ *language and library can build the application can't contoroll application flow
+ *framework can contorl application flow
+ *library is a set of factories and  factory is a set of value and functions
+
+	value, function => Factory => Service => Application
+
+-A library can be implement in using 2 techniques
+	a)Legacy
+	b)Modular
+
+   *A Legacy Library imports everthing into memory, but uses only few.
+    it leads to memory overload and application is heavy
+   
+   *A Modular Library imports only the required content for state and situatuion.
+    it makes the application light weight.
+
+-JavaScript uses various modules system like
+	a)Commonn Js
+	b)UMD (Universal Module Distructions)
+	c)AMD (Asynchronous Module Distuctions)
+    b)JavaScript Module	[ES Module]
+
+-The Defalut Module System of Node Js is "Common Js" it uses JavaScript V8 
+ compiler.
+
+
+
+
+
+
+
+
+
+					
+					
+					30th Video
+		=====================================
+Modules in JavaScript
+Module System
+	-Common Js
+	-UMD
+	-AMD
+	-ES
+
+
+				JavaScript Modular
+			========================
+-A Module comprises of value, function and classes.
+-You can create a factory with module
+-You can build an application by uisng modules.
+-Application with modules enable features like
+	a)Reusability
+	b)Extensibility
+	c)Maintainability
+	d)Testability
+-Every JavaScript file is considered as moduler.
+
+		home.js
+
+		//values
+		//functions
+		//classes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
